@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import { lazy, Suspense, useEffect, useRef, useState } from "react";
 import {
   SVG,
   CalcStick,
@@ -10,17 +10,23 @@ import {
 import { One, Two, Three, outlineDraw } from "./logo/prefs";
 import "./App.css";
 
+const AnimationEditor = lazy(() => import("./AnimationEditor"));
+
 const OneOutlinePath = getRandom(outlineDraw);
 const TwoOutlinePath = getRandom(outlineDraw);
 const ThreeOutlinePath = getRandom(outlineDraw);
+const DEFAULT_CONTROLS = {
+  speed: 50,
+  size: 100
+};
 
-let OneStickStart = CalcStick(One);
-let TwoStickStart = CalcStick(Two);
-let ThreeStickStart = CalcStick(Three);
+const isEditorEnabled = () => {
+  if (typeof window === "undefined") {
+    return false;
+  }
 
-let OneStickEnd = CalcStick(One);
-let TwoStickEnd = CalcStick(Two);
-let ThreeStickEnd = CalcStick(Three);
+  return new URLSearchParams(window.location.search).has("editor");
+};
 
 function easeInOut(t) {
   return t < 0.5 ? 4 * t * t * t : (t - 1) * (2 * t - 2) * (2 * t - 2) + 1;
@@ -46,63 +52,82 @@ const blend = (start, end, f) => {
   };
 };
 
-let OneStick = blend(OneStickStart, OneStickEnd, 0);
-let TwoStick = blend(TwoStickStart, TwoStickEnd, 0);
-let ThreeStick = blend(ThreeStickStart, ThreeStickEnd, 0);
-let skip = false;
+const createStickState = () => ({
+  one: {
+    start: CalcStick(One),
+    end: CalcStick(One)
+  },
+  two: {
+    start: CalcStick(Two),
+    end: CalcStick(Two)
+  },
+  three: {
+    start: CalcStick(Three),
+    end: CalcStick(Three)
+  }
+});
+
+const advanceStickState = sticks => {
+  sticks.one.start = sticks.one.end;
+  sticks.one.end = CalcStick(One);
+  sticks.two.start = sticks.two.end;
+  sticks.two.end = CalcStick(Two);
+  sticks.three.start = sticks.three.end;
+  sticks.three.end = CalcStick(Three);
+};
 
 function App() {
   const [count, setCount] = useState(0);
+  const [controls, setControls] = useState(DEFAULT_CONTROLS);
+  const [editorEnabled] = useState(isEditorEnabled);
+  const requestRef = useRef();
+  const previousTimeRef = useRef();
+  const countRef = useRef(0);
+  const sticksRef = useRef();
+  const speedRef = useRef(controls.speed);
 
-  // Use useRef for mutable variables that we want to persist
-  // without triggering a re-render on their change
+  speedRef.current = controls.speed;
 
-  const requestRef = React.useRef();
-  const previousTimeRef = React.useRef();
-
-  const animate = time => {
-    if (previousTimeRef.current !== undefined) {
-      const deltaTime = time - previousTimeRef.current;
-
-      // Pass on a function to the setter of the state
-      // to make sure we always have the latest state
-      setCount(prevCount => {
-        const newState = (prevCount + (deltaTime * 1) / 50) % 50;
-
-        if (newState < prevCount) {
-          // if (skip) {
-          //   skip = !skip; // no idea why it gets two times called
-          // } else {
-          //   skip = !skip; // no idea why it gets two times called
-          OneStickStart = OneStickEnd;
-          OneStickEnd = CalcStick(One);
-          TwoStickStart = TwoStickEnd;
-          TwoStickEnd = CalcStick(Two);
-          ThreeStickStart = ThreeStickEnd;
-          ThreeStickEnd = CalcStick(Three);
-          // }
-        }
-
-        return newState;
-      });
-    }
-    previousTimeRef.current = time;
-    requestRef.current = requestAnimationFrame(animate);
-  };
+  if (!sticksRef.current) {
+    sticksRef.current = createStickState();
+  }
 
   useEffect(() => {
-    requestRef.current = requestAnimationFrame(animate);
-    return () => cancelAnimationFrame(requestRef.current);
-  }, [animate]); // Make sure the effect runs only once
+    const animate = time => {
+      if (previousTimeRef.current !== undefined) {
+        const deltaTime = time - previousTimeRef.current;
+        const speed = Math.max(1, speedRef.current);
+        const newState = (countRef.current + deltaTime / speed) % speed;
 
-  OneStick = blend(OneStickStart, OneStickEnd, (1 / 50) * count);
-  TwoStick = blend(TwoStickStart, TwoStickEnd, (1 / 50) * count);
-  ThreeStick = blend(ThreeStickStart, ThreeStickEnd, (1 / 50) * count);
+        if (newState < countRef.current) {
+          advanceStickState(sticksRef.current);
+        }
+
+        countRef.current = newState;
+        setCount(newState);
+      }
+
+      previousTimeRef.current = time;
+      requestRef.current = requestAnimationFrame(animate);
+    };
+
+    requestRef.current = requestAnimationFrame(animate);
+    return () => {
+      cancelAnimationFrame(requestRef.current);
+      previousTimeRef.current = undefined;
+    };
+  }, []);
+
+  const { one, two, three } = sticksRef.current;
+  const speed = Math.max(1, controls.speed);
+  const OneStick = blend(one.start, one.end, count / speed);
+  const TwoStick = blend(two.start, two.end, count / speed);
+  const ThreeStick = blend(three.start, three.end, count / speed);
 
   return (
     <div className="App">
       <div className="App-bg">
-        <SVG>
+        <SVG scale={controls.size}>
           {/* DrawGrid() */}
           {DrawStick(OneStick, One.color)}
           {DrawStick(TwoStick, Two.color)}
@@ -118,7 +143,7 @@ function App() {
       </div>
 
       <div className="App-bg">
-        <SVG>
+        <SVG scale={controls.size}>
           {/* DrawGrid() */}
           {DrawOutline(OneStick, One.color, OneOutlinePath)}
           {DrawOutline(TwoStick, Two.color, TwoOutlinePath)}
@@ -134,7 +159,7 @@ function App() {
             <br />
             Schule&nbsp;für Gestaltung Zürich{" "}
             <a
-              class=""
+              className=""
               rel="noopener noreferrer"
               href="https://sfgz.ch"
               target="_blank"
@@ -151,7 +176,7 @@ function App() {
             <br />
             8005&nbsp;Zürich{" "}
             <a
-              class=""
+              className=""
               rel="noopener noreferrer"
               href="https://goo.gl/maps/mPSGSN56B21iZGTJ6"
               target="_blank"
@@ -164,12 +189,17 @@ function App() {
             rel="noopener noreferrer"
             href="https://forms.gle/U5eY7ohNSczT8S2D7"
             target="_blank"
-            class="a--underline"
+            className="a--underline"
           >
             Bitte Anmelden
           </a>
         </div>
       </div>
+      {editorEnabled && (
+        <Suspense fallback={null}>
+          <AnimationEditor controls={controls} onChange={setControls} />
+        </Suspense>
+      )}
     </div>
   );
 }

@@ -15,18 +15,20 @@ const MEDIA = 200;
 //   style={{ fill: "rgb(255,255,255)", strokeWidth: 0 }}
 // />
 
-export const SVG = ({ children }) => (
+export const SVG = ({ children, scale = 100 }) => (
   <svg
     xmlns="http://www.w3.org/2000/svg"
-    xlinkHref="http://www.w3.org/1999/xlink"
+    xmlnsXlink="http://www.w3.org/1999/xlink"
     preserveAspectRatio="xMinYMin slice"
     version="1.1"
     viewBox={`0 0 ${MEDIA} ${MEDIA * 3}`}
     width={MEDIA}
     height={MEDIA * 3}
   >
-    <g transform={`translate(${(MEDIA - SIZE) / 2},${(MEDIA - SIZE) / 2})`}>
-      {children}
+    <g transform={`scale(${scale / 100},${scale / 100})`}>
+      <g transform={`translate(${(MEDIA - SIZE) / 2},${(MEDIA - SIZE) / 2})`}>
+        {children}
+      </g>
     </g>
   </svg>
 );
