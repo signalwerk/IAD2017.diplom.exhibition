@@ -53,12 +53,12 @@ export const shortenLine = (start, end, smallerLen) => {
     start: {
       // The new point is the starting plus the smaller length.
       x: start.x + smallerXLen,
-      y: start.y + smallerYLen
+      y: start.y + smallerYLen,
     },
     end: {
       x: end.x - smallerXLen,
-      y: end.y - smallerYLen
-    }
+      y: end.y - smallerYLen,
+    },
   };
 };
 
@@ -71,13 +71,13 @@ export const expandLine = (x1, y1, x2, y2, dist) => {
   return [
     {
       x: Math.sin(angle) * dist + x1,
-      y: -Math.cos(angle) * dist + y1
+      y: -Math.cos(angle) * dist + y1,
     },
 
     {
       x: -Math.sin(angle) * dist + x1,
-      y: Math.cos(angle) * dist + y1
-    }
+      y: Math.cos(angle) * dist + y1,
+    },
   ];
 };
 
@@ -119,7 +119,7 @@ export const calcStickOutLine = (p1, p2) => {
     shortLine.start.y,
     shortLine.end.x,
     shortLine.end.y,
-    pathExtendedWidth / 2
+    pathExtendedWidth / 2,
   );
 
   var p1r = topPoints[1];
@@ -130,7 +130,7 @@ export const calcStickOutLine = (p1, p2) => {
     shortLine.end.y,
     shortLine.start.x,
     shortLine.start.y,
-    pathExtendedWidth / 2
+    pathExtendedWidth / 2,
   );
   var p2r = bottomPoints[0];
   var p2l = bottomPoints[1];
@@ -143,7 +143,7 @@ export const calcStickOutLine = (p1, p2) => {
     p1r: p1r,
     p1l: p1l,
     p2r: p2r,
-    p2l: p2l
+    p2l: p2l,
   };
 };
 
@@ -159,7 +159,7 @@ export const DrawGrid = () => {
           r={0.05 * SIZE}
           stroke="none"
           fill="#555"
-        />
+        />,
       );
     }
   }
@@ -174,13 +174,14 @@ export const DrawStick = (prefs, color) => {
       fill="none"
       stroke={color}
       strokeWidth={PATHWIDTH * SIZE}
-      d={`M ${start.x * SIZE},${start.y * SIZE} L ${end.x * SIZE},${end.y *
-        SIZE}`}
+      d={`M ${start.x * SIZE},${start.y * SIZE} L ${end.x * SIZE},${
+        end.y * SIZE
+      }`}
     />
   );
 };
 
-export const getRandom = list => {
+export const getRandom = (list) => {
   return list[Math.floor(Math.random() * list.length)];
 };
 
@@ -200,7 +201,7 @@ export const DrawOutline = (prefs, color, drawPaths) => {
   let d = points
     .map(
       (item, index) =>
-        `${index === 0 ? "M" : "L"} ${item.x * SIZE},${item.y * SIZE}`
+        `${index === 0 ? "M" : "L"} ${item.x * SIZE},${item.y * SIZE}`,
     )
     .join(" ");
 
@@ -220,7 +221,7 @@ const randomBetween = (min, max) => {
   return Math.floor(Math.random() * (max - min + 1) + min);
 };
 
-export const CalcStick = prefs => {
+export const CalcStick = (prefs) => {
   const { minX, maxX, minY, maxY } = prefs;
 
   const width = randomBetween(minX, maxX);
@@ -235,23 +236,23 @@ export const CalcStick = prefs => {
     return {
       start: {
         x: (1 / (GRID_X - 1)) * xOffset,
-        y: (1 / (GRID_Y - 1)) * yOffset
+        y: (1 / (GRID_Y - 1)) * yOffset,
       },
       end: {
         x: (1 / (GRID_X - 1)) * (xOffset + width),
-        y: (1 / (GRID_Y - 1)) * (yOffset + height)
-      }
+        y: (1 / (GRID_Y - 1)) * (yOffset + height),
+      },
     };
   } else {
     return {
       start: {
         x: (1 / (GRID_X - 1)) * (xOffset + width),
-        y: (1 / (GRID_Y - 1)) * yOffset
+        y: (1 / (GRID_Y - 1)) * yOffset,
       },
       end: {
         x: (1 / (GRID_X - 1)) * xOffset,
-        y: (1 / (GRID_Y - 1)) * (yOffset + height)
-      }
+        y: (1 / (GRID_Y - 1)) * (yOffset + height),
+      },
     };
   }
 };

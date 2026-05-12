@@ -5,7 +5,7 @@ import {
   DrawStick,
   // DrawGrid,
   DrawOutline,
-  getRandom
+  getRandom,
 } from "./logo";
 import { One, Two, Three, outlineDraw } from "./logo/prefs";
 import "./App.css";
@@ -17,7 +17,7 @@ const TwoOutlinePath = getRandom(outlineDraw);
 const ThreeOutlinePath = getRandom(outlineDraw);
 const DEFAULT_CONTROLS = {
   speed: 50,
-  size: 100
+  size: 100,
 };
 
 const isEditorEnabled = () => {
@@ -43,31 +43,31 @@ const blend = (start, end, f) => {
   return {
     start: {
       x: getTween(start.start.x, end.start.x, f),
-      y: getTween(start.start.y, end.start.y, f)
+      y: getTween(start.start.y, end.start.y, f),
     },
     end: {
       x: getTween(start.end.x, end.end.x, f),
-      y: getTween(start.end.y, end.end.y, f)
-    }
+      y: getTween(start.end.y, end.end.y, f),
+    },
   };
 };
 
 const createStickState = () => ({
   one: {
     start: CalcStick(One),
-    end: CalcStick(One)
+    end: CalcStick(One),
   },
   two: {
     start: CalcStick(Two),
-    end: CalcStick(Two)
+    end: CalcStick(Two),
   },
   three: {
     start: CalcStick(Three),
-    end: CalcStick(Three)
-  }
+    end: CalcStick(Three),
+  },
 });
 
-const advanceStickState = sticks => {
+const advanceStickState = (sticks) => {
   sticks.one.start = sticks.one.end;
   sticks.one.end = CalcStick(One);
   sticks.two.start = sticks.two.end;
@@ -93,7 +93,7 @@ function App() {
   }
 
   useEffect(() => {
-    const animate = time => {
+    const animate = (time) => {
       if (previousTimeRef.current !== undefined) {
         const deltaTime = time - previousTimeRef.current;
         const speed = Math.max(1, speedRef.current);

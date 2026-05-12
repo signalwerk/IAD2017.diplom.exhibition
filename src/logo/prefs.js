@@ -4,7 +4,7 @@ export const One = {
   maxX: 2,
   minY: 3,
   maxY: 3,
-  color: "#558779" // '#00ff99',
+  color: "#558779", // '#00ff99',
 };
 
 export const Three = {
@@ -12,7 +12,7 @@ export const Three = {
   maxX: 0,
   minY: 2,
   maxY: 2,
-  color: "#899f95" // '#330099',
+  color: "#899f95", // '#330099',
 };
 
 export const Two = {
@@ -20,32 +20,32 @@ export const Two = {
   maxX: 1,
   minY: 1,
   maxY: 1,
-  color: "#b1a455" // '#9966cc',
+  color: "#b1a455", // '#9966cc',
 };
 
 export const outlineDraw = [
   // L-shape A
   [
     ["p1", "p1l", "p2l"],
-    ["p2", "p2r", "p1r"]
+    ["p2", "p2r", "p1r"],
   ],
 
   // L-shape B
   [
     ["p1", "p1r", "p2r"],
-    ["p2", "p2l", "p1l"]
+    ["p2", "p2l", "p1l"],
   ],
 
   // D-shape A
   [
     ["p1", "p1l", "p2l", "p2"],
-    ["p2r", "p1r"]
+    ["p2r", "p1r"],
   ],
 
   // D-shape B
   [
     ["p1", "p1r", "p2r", "p2"],
-    ["p2l", "p1l"]
+    ["p2l", "p1l"],
   ],
 
   // O-shape A
@@ -58,5 +58,5 @@ export const outlineDraw = [
   [["p2", "p2r", "p1r", "p1", "p1l", "p2l"]],
 
   // O-shape C
-  [["p2r", "p1r", "p1", "p1l", "p2l", "p2"]]
+  [["p2r", "p1r", "p1", "p1l", "p2l", "p2"]],
 ];
